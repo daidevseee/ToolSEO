@@ -40,3 +40,7 @@
     display: flex;
     
   }
+  textarea:focus {
+    outline: none;
+  }
+  

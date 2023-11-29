@@ -29,6 +29,7 @@ const URLTable = ({ urls, onRefresh, filter}) => {
         const date = new Date(dateTimeStr);
         return date.toLocaleString(); // Định dạng theo định dạng địa phương
     };
+    const urlcache = 'cache:'
     return (
         <>
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -54,7 +55,7 @@ const URLTable = ({ urls, onRefresh, filter}) => {
 
             <tr key={url.id_cache} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {url.url}
+                    <a href={urlcache+url.url}>{url.url}</a>
                 </th>
                 <td className="px-6 py-4">
                 {url.status === 1 ? 'Đã cache ✅' : 'Chưa cache ❌'}
