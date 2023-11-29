@@ -1,24 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
-
+import React from "react";
+import {Routes, Route} from 'react-router-dom'
+import Home from "./page/home";
+import Checkdmca from "./components/checkdmca";
+import Adddmca from "./components/add-dmca";
+import Cache from "./components/cache"
+import RequirePassword from "./page/RequirePassword";
+import WithAuthProtection from "./Private/WithAuthProtection";
 function App() {
+  const ProtectedCheckdmca = WithAuthProtection(Checkdmca);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   <>
+    <Routes>
+              <Route path="/" element={<RequirePassword><Home /></RequirePassword>} />
+              <Route path="/check-dmca" element={<RequirePassword><ProtectedCheckdmca /></RequirePassword>} />
+              <Route path="/add-dmca" element={<RequirePassword><Adddmca /></RequirePassword>} />
+              <Route path="/cache" element={<RequirePassword><Cache /></RequirePassword>} />
+    </Routes>
+   </>
   );
 }
 

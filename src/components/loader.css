@@ -1,0 +1,42 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Đảm bảo nằm trên tất cả các phần tử khác */
+  }
+  .btn-check-cache{
+    display: flex;
+    justify-content: end;
+  }
+  .loading-text {
+    color: white; /* Màu chữ */
+    font-size: 24px; /* Kích thước chữ */
+  }
+  .button{
+    display: flex;
+    justify-content: center;
+    margin-top: 8%;
+  }
+  .cache{
+    max-width: 1250px;
+    margin-left:132.6px;
+    margin-top: 8%;
+  }
+  .button button{
+    margin-left: 10px;
+  }
+  .button-exp{
+    display: flex;
+    justify-content: end;
+    margin-left: 10px;
+  }
+  .loading .loading-spinner .text-warning{
+    display: flex;
+    
+  }
