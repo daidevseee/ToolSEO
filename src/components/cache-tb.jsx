@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const URLTable = ({ urls, onRefresh, filter}) => {
-   
+const URLTable = ({ urls, onRefresh, filters}) => {
+    const [localUrls, setLocalUrls] = useState(urls);
 
     const handleDelete = async (id) => {
         try {
@@ -14,21 +14,66 @@ const URLTable = ({ urls, onRefresh, filter}) => {
         }
       };
       const getFilteredUrls = () => {
-        switch (filter) {
-          case 'cached':
-            return urls.filter(url => url.status === 1);
-          case 'not-cached':
-            return urls.filter(url => url.status === 0);
-          default:
-            return urls;
-        }
-      };
+        return urls.filter(url => {
+            let matchesCacheFilter = true;
+            let matchesTypeFilter = true;
     
-      const filteredUrls = getFilteredUrls();
+            if (filters.cached && url.status !== 1) {
+                matchesCacheFilter = false;
+            }
+    
+            if (filters.notCached && url.status !== 0) {
+                matchesCacheFilter = false;
+            }
+    
+            if (filters.page && url.url_type !== 'page') {
+                matchesTypeFilter = false;
+            }
+    
+            if (filters.post && url.url_type !== 'post') {
+                matchesTypeFilter = false;
+            }
+    
+            return matchesCacheFilter && matchesTypeFilter;
+        });
+    };
+    
+      
+    
+    // const filteredUrls = getFilteredUrls();
     const formatDateTime = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
         return date.toLocaleString(); // Định dạng theo định dạng địa phương
     };
+    useEffect(() => {
+        setLocalUrls(urls); // Cập nhật localUrls mỗi khi urls từ props thay đổi
+    }, [urls]);
+
+    const handleTypeChange = async (id, newType) => {
+        try {
+            // Cập nhật trạng thái cục bộ trước khi gọi API
+            const updatedUrls = localUrls.map(url => {
+                if (url.id_cache === id) {
+                    return { ...url, urlType: newType };
+                }
+                return url;
+            });
+            setLocalUrls(updatedUrls);
+
+            // Gọi API để cập nhật trên server
+            await axios.post('http://localhost:8000/update-cache-type', {
+                urlIds: [id],
+                urlType: newType
+            });
+            toast.success("Loại URL đã được cập nhật!");
+            onRefresh();
+        } catch (error) {
+            toast.error("Có lỗi xảy ra khi cập nhật loại URL!");
+        }
+    };
+
+    // Sử dụng localUrls cho việc hiển thị và lọc dữ liệu
+    const filteredUrls = getFilteredUrls(localUrls);
     const urlcache = 'cache:'
     return (
         <>
@@ -43,6 +88,9 @@ const URLTable = ({ urls, onRefresh, filter}) => {
                     Status
                 </th>
                 <th scope="col" className="px-6 py-3">
+                    Type
+                </th>
+                <th scope="col" className="px-6 py-3">
                     Time
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -55,12 +103,20 @@ const URLTable = ({ urls, onRefresh, filter}) => {
 
             <tr key={url.id_cache} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href={urlcache+url.url}>{url.url}</a>
+                    <a target='_blank' href={urlcache+url.url}>{url.url}</a>
                 </th>
                 <td className="px-6 py-4">
                 {url.status === 1 ? 'Đã cache ✅' : 'Chưa cache ❌'}
                 </td>
-                
+                <td className='px-6 py-4'>
+                <select 
+                  defaultValue={url.url_type} 
+                  onChange={(e) => handleTypeChange(url.id_cache, e.target.value)}
+                >
+                    <option value="page">Page</option>
+                    <option value="post">Post</option>
+                </select>
+                </td>
                 <td className="px-6 py-4">
                 {formatDateTime(url.time)}
                 </td>
