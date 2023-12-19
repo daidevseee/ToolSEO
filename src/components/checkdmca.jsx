@@ -55,7 +55,7 @@ useEffect(() => {
 const compare = async () => {
       try {
         setIsLoading(true); // Bắt đầu tải
-        const response = await fetch('http://14.225.198.206:8000/compare');
+        const response = await fetch('http://localhost:8000/compare');
         const data = await response.json();
         setDifference(data);
         setActiveButton('compare');

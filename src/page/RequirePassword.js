@@ -3,8 +3,8 @@ import { useNavigate, useLocation  } from 'react-router-dom';
 
 
 const passwordPermissions = {
-    "1234": ["/", "/check-dmca", "/add-dmca", "/cache"], // Đường dẫn chính xác
-    "1111": ["/","/cache"] // Mật khẩu này chỉ có quyền truy cập component /cache
+    "1234": ["/", "/check-dmca", "/add-dmca", "/cache","file-schema"], // Đường dẫn chính xác
+    "1111": ["/","/cache","file-schema"] // Mật khẩu này chỉ có quyền truy cập component /cache
   };
   
   const RequirePassword = ({ children }) => {

@@ -1,10 +1,17 @@
 import React ,{useState, useEffect} from 'react'
+import { signOut } from "firebase/auth";
+import { auth } from "../Service/firebase";
 import { Link, useNavigate  } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Logo from './Logo-Vietnix-1.png';
 import './app.css';
 export default function Navbar() {
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    setCurrentUser(user);
+  }, []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -26,21 +33,15 @@ export default function Navbar() {
     }, 3000);
 
   };
-  const handleLinkClick = (event, path) => {
-    const authData = JSON.parse(localStorage.getItem('authData'));
-    
-    if (!authData) {
-      event.preventDefault(); // Ngăn chặn việc chuyển hướng
-      toast.error('Bạn cần đăng nhập để truy cập trang này.');
-      return;
-    }
-  
-    const { authTimestamp, permissions } = authData;
-    if ((new Date().getTime() - authTimestamp) >= 3600000 || !permissions.includes(path)) {
-      event.preventDefault(); // Ngăn chặn việc chuyển hướng
-      toast.error('Bạn không có quyền truy cập chức năng này!');
-    }
+  const logout = () => {
+    signOut(auth).then(() => {
+      toast.success('Đăng xuất thành công!')
+      navigate('/login')
+    }).catch((error) => {
+      // Xử lý lỗi
+    });
   };
+  
   return (
    <>
 
@@ -61,14 +62,26 @@ export default function Navbar() {
     </span>
   </Link>
   <div className="flex items-center md:order-2 space-x-1 md:space-x-2 rtl:space-x-reverse">
+  <span className='flex'>Hi {currentUser?.name}</span>
+  <button
+  type="button"
+  className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+  id="user-menu-button"
+  aria-expanded="false"
+  data-dropdown-toggle="user-dropdown"
+  data-dropdown-placement="bottom"
+>
+  <span className="sr-only">Open user menu</span>
+  <img
+    className="w-8 h-8 rounded-full"
+    src={currentUser?.avatar}
+    alt="user photo"
+  />
+</button>
+
+
     <a 
-      onClick={handleLogout}
-      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-    >
-      <i class="fa fa-key" aria-hidden="true"></i>
-    </a>
-    <a 
-      onClick={handleLogout}
+      onClick={logout}
       className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 md:px-5 md:py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
     >
       <i class="fa fa-power-off" aria-hidden="true"></i>
@@ -146,7 +159,7 @@ export default function Navbar() {
             >
               <li>
                 <Link
-                  to={'/check-dmca'} onClick={(e) => handleLinkClick(e, '/check-dmca')}
+                  to={'/check-dmca'} onClick={(e) => (e, '/check-dmca')}
                   className="flex items-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 group"
                 >
                   <span className="sr-only">DMCA</span>
@@ -368,7 +381,9 @@ export default function Navbar() {
       </li>
     </ul>
   </div>
+  
   </div>
+  
 </nav>
 
    </>
