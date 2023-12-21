@@ -60,7 +60,6 @@ export default function banner() {
             <div className="flex mt-4 md:mt-6">
               <Link
                 to={"/check-dmca"}
-                onClick={(e) => handleLinkClick(e, "/check-dmca")}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Manager
@@ -110,7 +109,6 @@ export default function banner() {
             <div className="flex mt-4 md:mt-6">
               <a
                 to={"/404"}
-                onClick={(e) => handleLinkClick(e, "/404")}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Manager
@@ -211,7 +209,6 @@ export default function banner() {
             <div className="flex mt-4 md:mt-6">
               <Link
                 to={"/schema"}
-                // onClick={(e) => handleLinkClick(e, "/file-schema")}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Manager

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { useNavigate } from 'react-router-dom';
-import { auth } from "../Service/firebase";
+import { auth, db } from "../Service/firebase";
+import { setDoc, doc } from "firebase/firestore";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Login = () => {
@@ -10,15 +11,21 @@ const Login = () => {
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(async (result) => {
         const user = result.user;
-        // Lưu thông tin người dùng vào localStorage hoặc state
+        
+        // Tạo một đối tượng user để lưu vào Firestore
         const userData = {
           name: user.displayName,
           email: user.email,
-          avatar: user.photoURL
+          avatar: user.photoURL,
+          role: "manager"
+          // Thêm các thông tin khác nếu cần thiết
         };
-        localStorage.setItem('user', JSON.stringify(userData));
+  
+        // Lưu thông tin người dùng vào Firestore
+        await setDoc(doc(db, "users-vietnix", user.uid), userData);
+  
         navigate('/');
       })
       .catch((error) => {
@@ -27,7 +34,9 @@ const Login = () => {
   };
 
   return (
-    <div style={{display:"flex", justifyContent:"center", alignContent:"center"}}>
+    <>
+    
+    <div style={{position:"absolute", left:"45%", top:"50%"}}>
       <button onClick={signInWithGoogle}
   type="button" 
   className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
@@ -49,6 +58,7 @@ const Login = () => {
 </button>
 
     </div>
+    </>
   );
 };
 

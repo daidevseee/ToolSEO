@@ -1,35 +1,53 @@
-import React, { useState } from 'react';
-import { db, storage } from '../Service/firebase';
+import React, { useState, useEffect } from 'react';
+import { db, storage, auth } from '../Service/firebase';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import Modal from './Modal';
 
 function UploadForm({ currentFolder }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser({
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          avatar: user.photoURL
+        });
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleUpload = async () => {
-    if (file && currentFolder) {
+    if (file && currentFolder && currentUser) {
       const fileRef = ref(storage, `${currentFolder}/${file.name}`);
       await uploadBytes(fileRef, file);
       const url = await getDownloadURL(fileRef);
-  
-      // Lấy thông tin người dùng từ localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
-  
+
       await addDoc(collection(db, "files"), {
         name: file.name,
         folder: currentFolder,
         url,
         createdAt: serverTimestamp(),
         size: file.size,
-        uploaderName: user.name,  // Tên người dùng
-        uploaderAvatar: user.avatar,  // Avatar người dùng
+        uploaderId: currentUser.uid,  // ID của người dùng
+        uploaderName: currentUser.name,  // Tên người dùng
+        uploaderAvatar: currentUser.avatar,  // Avatar người dùng
       });
-  
+
       setIsModalOpen(false); // Đóng modal sau khi tải lên
     }
   };
+
 
   return (
     <div style={{display:"flex", width:"1393px", justifyContent:"flex-end"}}>

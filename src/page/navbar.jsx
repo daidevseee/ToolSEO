@@ -1,6 +1,8 @@
 import React ,{useState, useEffect} from 'react'
 import { signOut } from "firebase/auth";
-import { auth } from "../Service/firebase";
+import { auth, db } from "../Service/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { Link, useNavigate  } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,8 +11,19 @@ import './app.css';
 export default function Navbar() {
   const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    setCurrentUser(user);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const unsubscribe = onSnapshot(doc(db, "users-vietnix", user.uid), (doc) => {
+          setCurrentUser(doc.data());
+        });
+
+        return unsubscribe; // Hủy lắng nghe khi component bị unmount
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return unsubscribeAuth; // Hủy lắng nghe khi component bị unmount
   }, []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -35,8 +48,14 @@ export default function Navbar() {
   };
   const logout = () => {
     signOut(auth).then(() => {
-      toast.success('Đăng xuất thành công!')
-      navigate('/login')
+      // Xóa thông tin người dùng từ localStorage
+      localStorage.removeItem('user');
+  
+      toast.success('Đăng xuất thành công!');
+      navigate('/login');
+  
+      // Cập nhật trạng thái người dùng trên ứng dụng (nếu cần)
+      // updateUserState(null);
     }).catch((error) => {
       // Xử lý lỗi
     });
