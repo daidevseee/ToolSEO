@@ -136,3 +136,9 @@
   .flex:hover .delete-button {
     display: block; /* hoặc inline-block tùy thuộc vào layout của bạn */
   }
+  .diagram-container {
+    width: 100%;
+    height: 500px; /* Đặt chiều cao cố định hoặc theo tỷ lệ phần trăm */
+    border: 1px solid black; /* Chỉ để kiểm tra hiển thị */
+  }
+  

@@ -8,6 +8,7 @@ import Schema from "./components/schema";
 import UploadPage from "./components/UploadPage";
 import RequireAuth from "./Private/RequireAuth";
 import Login from "./Private/Login";
+import Flowdiagram from "./components/Flowdiagram";
 import RequireRole from "./Private/WithAuthProtection";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/add-dmca" element={<RequireRole allowedRoles={['admin']}><Adddmca /></RequireRole>} />
         <Route path="/cache" element={<RequireRole allowedRoles={['manager', 'admin']}><Cache /></RequireRole>} />
         <Route path="/schema" element={<RequireRole allowedRoles={['manager', 'admin']}><Schema /></RequireRole>} />
+        <Route path="/schema-diagram" element={<RequireRole allowedRoles={['manager', 'admin']}><Flowdiagram /></RequireRole>} />
         <Route path="/schema/folder/:folderId" element={<RequireRole allowedRoles={['admin', 'manager']}><UploadPage /></RequireRole>} />
       </Routes>
     </>

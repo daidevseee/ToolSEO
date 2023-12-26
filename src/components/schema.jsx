@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import FolderCreationForm from './FolderCreationForm';
 import FolderList from './FolderList';
 import Navbar from '../page/navbar';
+import Flowdiagram from './Flowdiagram';
 
 
 function Schema() {
@@ -19,7 +20,6 @@ function Schema() {
             <div>
             </div>
             <div style={{marginTop:"110px"}}>
-           
                 <FolderCreationForm />
                 <FolderList onSelectFolder={handleSelectFolder} />
             </div>
