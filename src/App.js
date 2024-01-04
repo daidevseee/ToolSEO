@@ -10,6 +10,7 @@ import RequireAuth from "./Private/RequireAuth";
 import Login from "./Private/Login";
 import Flowdiagram from "./components/Flowdiagram";
 import RequireRole from "./Private/WithAuthProtection";
+import SchemaGenerator from "./components/schema-generator ";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
         <Route path="/check-dmca" element={<RequireRole allowedRoles={['admin']}><Checkdmca /></RequireRole>} />
+        <Route path="/schema-generator" element={<RequireRole allowedRoles={['admin']}><SchemaGenerator /></RequireRole>} />
         <Route path="/add-dmca" element={<RequireRole allowedRoles={['admin']}><Adddmca /></RequireRole>} />
         <Route path="/cache" element={<RequireRole allowedRoles={['manager', 'admin']}><Cache /></RequireRole>} />
         <Route path="/schema" element={<RequireRole allowedRoles={['manager', 'admin']}><Schema /></RequireRole>} />

@@ -25,6 +25,7 @@ function FolderCreationForm() {
     return (
         <div style={{display:"flex", width:"1393px", justifyContent:"flex-end"}}>
             <Link to={'/schema-diagram'} className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Schema Diagram </Link>
+            <Link to={'/schema-generator'} className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Schema Generator </Link>
             <button className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" onClick={() => setIsModalOpen(true)}>Create Folder</button>
             <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen}>
                 <div>

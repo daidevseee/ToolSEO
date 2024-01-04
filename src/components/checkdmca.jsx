@@ -3,7 +3,8 @@ import Navbar from '../page/navbar';
 import './loader.css'
 import Logo_Dmca from './dmca-logo.png'
 import * as XLSX from 'xlsx';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function calculateTimeRemaining() {
     const now = new Date();
@@ -55,7 +56,7 @@ useEffect(() => {
 const compare = async () => {
       try {
         setIsLoading(true); // Bắt đầu tải
-        const response = await fetch('http://localhost:8000/compare');
+        const response = await fetch('http://14.225.198.206:8000/compare');
         const data = await response.json();
         setDifference(data);
         setActiveButton('compare');
@@ -108,6 +109,34 @@ const compare = async () => {
       }
   };
   
+  const addUrl = async (newUrl) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('http://14.225.198.206:8000/add-url', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url: newUrl })
+      });
+  
+      if (response.ok) {
+          // Thêm URL mới vào danh sách URL hiện có
+          setUrls(prevUrls => [...prevUrls, newUrl]);
+      } else {
+          const data = await response.json();
+          console.error("Error adding URL:", data.error);
+      }
+    } catch (error) {
+      console.error("Error calling add URL API:", error);
+    } finally {
+      toast.success("Thêm thành công")
+      setIsLoading(false);
+    }
+  };
+  const handleAddUrl = async (url) => {
+    await addUrl(url);
+  };
   
     const exportToExcel = (data, fileName) => {
       const formattedData = data.map(url => ({ url }));
@@ -138,6 +167,7 @@ const compare = async () => {
   return (
     <>
       <Navbar></Navbar>
+      <ToastContainer />
       <div className='button'>
       <button className='btn btn-info' onClick={compare}>Compare</button>
       <button className='btn btn-success' onClick={getAllUrls}>Get All URLs DMCA</button>
@@ -200,6 +230,7 @@ const compare = async () => {
                   <th>URLs chưa được Add DMCA</th>
                   <th>Count</th>
                   <th>Status</th>
+                  <th>Add</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,7 +240,8 @@ const compare = async () => {
                     <td key={url}><a target='_blank' href={link_dmca+url}>{url}</a></td>
                     <td>DMCA sẽ được ADD sau: <span style={{color:'red', fontWeight:'bold'}}>{new Date(timeRemaining).toISOString().substr(11, 8)}</span> <span className="loading loading-spinner text-warning"></span>
 
- </td>
+                    </td>
+                    <button onClick={() => handleAddUrl(url)}>+</button>
                   </tr>
                 ))}
               </tbody>
@@ -233,6 +265,7 @@ const compare = async () => {
                   <tr key={index}>
                     <td>{id}</td>
                     <td>{url}</td>
+                    
                   </tr>
                 ))}
               </tbody>
