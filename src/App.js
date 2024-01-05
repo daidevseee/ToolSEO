@@ -11,7 +11,8 @@ import Login from "./Private/Login";
 import Flowdiagram from "./components/Flowdiagram";
 import RequireRole from "./Private/WithAuthProtection";
 import SchemaGenerator from "./components/schema-generator ";
-
+import TrafficForm from "./components/trafficForm";
+import Dashboard from "./components/dashboar-traffic";
 function App() {
   return (
     <>
@@ -24,6 +25,8 @@ function App() {
         <Route path="/cache" element={<RequireRole allowedRoles={['manager', 'admin']}><Cache /></RequireRole>} />
         <Route path="/schema" element={<RequireRole allowedRoles={['manager', 'admin']}><Schema /></RequireRole>} />
         <Route path="/schema-diagram" element={<RequireRole allowedRoles={['manager', 'admin']}><Flowdiagram /></RequireRole>} />
+        <Route path="/dashboard-traffic" element={<RequireRole allowedRoles={['manager', 'admin']}><Dashboard /></RequireRole>} />
+        <Route path="/traffic" element={<RequireRole allowedRoles={['manager', 'admin']}><TrafficForm /></RequireRole>} />
         <Route path="/schema/folder/:folderId" element={<RequireRole allowedRoles={['admin', 'manager']}><UploadPage /></RequireRole>} />
       </Routes>
     </>
