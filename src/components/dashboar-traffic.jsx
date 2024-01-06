@@ -81,31 +81,71 @@ const Dashboard = () => {
     <div style={{marginTop:"80px"}} className="max-w-7xl mx-auto my-10 p-8 border border-gray-300 rounded-md shadow-lg">
   <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">Dashboard Traffic</h2>
   <Modal  isOpen={isModalOpen} setIsOpen={setIsModalOpen}>
-                <form onSubmit={submitEdit}>
-                <input
-                      name="url"
-                      value={editingData.url}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      type="number"
-                      name="numberOfDays"
-                      value={editingData.numberOfDays}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      type="number"
-                      name="trafficPerDay"
-                      value={editingData.trafficPerDay}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      name="googleKeyword"
-                      value={editingData.googleKeyword || ''}
-                      onChange={handleEditChange}
-                  />
-                  <button type="submit">Lưu</button>
-                </form>
+                {editingData && (
+               <form onSubmit={submitEdit} className="space-y-4">
+               <h2 className="text-lg font-semibold text-gray-800">Chỉnh Sửa Traffic Data</h2>
+               
+               <div>
+                   <label htmlFor="url" className="block text-sm font-medium text-gray-700">URL</label>
+                   <input
+                       type="text"
+                       name="url"
+                       id="url"
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                       value={editingData.url}
+                       onChange={handleEditChange}
+                       required
+                   />
+               </div>
+               
+               <div>
+                   <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700">Số Ngày Chạy</label>
+                   <input
+                       type="number"
+                       name="numberOfDays"
+                       id="numberOfDays"
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                       value={editingData.numberOfDays}
+                       onChange={handleEditChange}
+                       required
+                   />
+               </div>
+       
+               <div>
+                   <label htmlFor="trafficPerDay" className="block text-sm font-medium text-gray-700">Traffic Mỗi Ngày</label>
+                   <input
+                       type="number"
+                       name="trafficPerDay"
+                       id="trafficPerDay"
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                       value={editingData.trafficPerDay}
+                       onChange={handleEditChange}
+                       required
+                   />
+               </div>
+       
+               <div>
+                   <label htmlFor="googleKeyword" className="block text-sm font-medium text-gray-700">Google Keyword</label>
+                   <input
+                       type="text"
+                       name="googleKeyword"
+                       id="googleKeyword"
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                       value={editingData.googleKeyword || ''}
+                       onChange={handleEditChange}
+                   />
+               </div>
+       
+               <div className="flex justify-end">
+                   <button
+                       type="submit"
+                       className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                   >
+                       Lưu Thay Đổi
+                   </button>
+               </div>
+           </form>
+          )}
             </Modal>
   {/* {editingData && (
               <form onSubmit={submitEdit}>
