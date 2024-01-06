@@ -7,7 +7,7 @@ const URLForm = ({ onAddUrl }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          await axios.post('http://localhost:8000/add-cache', { urls: input });
+          await axios.post('http://14.225.198.206:8000/add-cache', { urls: input });
           onAddUrl();
           setInput('');
           toast.success("URL đã được thêm thành công!");

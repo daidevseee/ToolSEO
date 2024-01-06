@@ -7,7 +7,7 @@ export default function Adddmca() {
 
   const addUrl = async () => {
     try {
-      const response = await fetch('http://localhost:8000/add-url', {
+      const response = await fetch('http://14.225.198.206:8000/add-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

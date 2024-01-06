@@ -4,8 +4,8 @@ export default function Modal({ isOpen, setIsOpen, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
-      <div className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
+    <div  className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
+      <div style={{backgroundColor:"#C0C0C0"}} className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
         {children}
         <div className="flex justify-between items-center mt-8">
           <button

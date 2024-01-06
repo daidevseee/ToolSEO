@@ -12,7 +12,7 @@ function App() {
     const [urls, setUrls] = useState([]);
     const [filter, setFilter] = useState('all');
     const fetchUrls = async () => {
-      const result = await axios('http://localhost:8000/get-cache');
+      const result = await axios('http://14.225.198.206:8000/get-cache');
       setUrls(result.data);
     };
     const [filters, setFilters] = useState({

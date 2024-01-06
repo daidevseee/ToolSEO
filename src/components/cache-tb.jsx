@@ -6,7 +6,7 @@ const URLTable = ({ urls, onRefresh, filters}) => {
 
     const handleDelete = async (id) => {
         try {
-          await axios.delete(`http://localhost:8000/delete-cache/${id}`);
+          await axios.delete(`http://14.225.198.206:8000/delete-cache/${id}`);
           onRefresh();
           toast.success("URL đã được xóa thành công!");
         } catch (error) {

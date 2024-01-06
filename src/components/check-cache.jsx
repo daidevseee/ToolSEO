@@ -8,7 +8,7 @@ const CheckCacheButton = ({ onCheckComplete }) => {
     const checkCache = async () => {
         setIsLoading(true);
         try {
-            await axios.get('http://localhost:8000/cache');
+            await axios.get('http://14.225.198.206:8000/cache');
             onCheckComplete();
             toast.info("Cache đã được kiểm tra thành công!");
         } catch (error) {

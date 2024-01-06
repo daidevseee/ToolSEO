@@ -3,8 +3,11 @@ import { db } from '../Service/firebase';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import TrafficChart from './TrafficChart';
 import Navbar from '../page/navbar';
+import Modal from './Modal';
 const Dashboard = () => {
     const [trafficData, setTrafficData] = useState([]);
+    const [editingData, setEditingData] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -46,13 +49,94 @@ const Dashboard = () => {
       
         return Math.floor(trafficToday);
       };
+       const startEdit = (data) => {
+        setEditingData(data);
+        setIsModalOpen(true);
+    };
+
+      const handleEditChange = (e) => {
+        setEditingData({ ...editingData, [e.target.name]: e.target.value });
+    };
+
+    const submitEdit = async (e) => {
+        e.preventDefault();
+        const docRef = doc(db, 'trafficData', editingData.id);
+        await updateDoc(docRef, {
+            ...editingData,
+            // Đảm bảo các trường dữ liệu cần thiết được cập nhật
+            url: editingData.url,
+            numberOfDays: editingData.numberOfDays,
+            trafficPerDay: editingData.trafficPerDay,
+            googleKeyword: editingData.googleKeyword
+        });
+
+        // Cập nhật state và đóng form chỉnh sửa
+        setIsModalOpen(false);
+        setEditingData(null);
+        // Refetch hoặc cập nhật state nếu cần
+    };
   return (
     <>
     <Navbar></Navbar>
     <div style={{marginTop:"80px"}} className="max-w-7xl mx-auto my-10 p-8 border border-gray-300 rounded-md shadow-lg">
   <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">Dashboard Traffic</h2>
+  <Modal  isOpen={isModalOpen} setIsOpen={setIsModalOpen}>
+                <form onSubmit={submitEdit}>
+                <input
+                      name="url"
+                      value={editingData.url}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      type="number"
+                      name="numberOfDays"
+                      value={editingData.numberOfDays}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      type="number"
+                      name="trafficPerDay"
+                      value={editingData.trafficPerDay}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      name="googleKeyword"
+                      value={editingData.googleKeyword || ''}
+                      onChange={handleEditChange}
+                  />
+                  <button type="submit">Lưu</button>
+                </form>
+            </Modal>
+  {/* {editingData && (
+              <form onSubmit={submitEdit}>
+                  <input
+                      name="url"
+                      value={editingData.url}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      type="number"
+                      name="numberOfDays"
+                      value={editingData.numberOfDays}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      type="number"
+                      name="trafficPerDay"
+                      value={editingData.trafficPerDay}
+                      onChange={handleEditChange}
+                  />
+                  <input
+                      name="googleKeyword"
+                      value={editingData.googleKeyword || ''}
+                      onChange={handleEditChange}
+                  />
+                  <button type="submit">Lưu</button>
+              </form>
+          )} */}
   {trafficData.map((data) => (
     <div key={data.id} className="mb-6 p-4 border rounded-lg bg-white shadow">
+      <button onClick={() => startEdit(data)}>Chỉnh sửa</button>
       <p className="text-lg font-semibold">
         URL: <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">{data.url}</a>
       </p>
@@ -76,6 +160,7 @@ const Dashboard = () => {
       <TrafficChart trafficData={[data]} />
     </div>
   ))}
+  
 </div>
     </>
 
