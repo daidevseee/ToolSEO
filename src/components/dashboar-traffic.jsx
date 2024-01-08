@@ -34,14 +34,15 @@ const Dashboard = () => {
     }, []);
   
     // Hàm giả lập tăng traffic hàng giờ
-    const simulateTraffic = (trafficPerDay, startDate, existingTrafficToday) => {
+    const simulateTraffic = (trafficPerDay, startDate, existingTrafficToday, isActive) => {
+        if (!isActive) return existingTrafficToday;
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const hoursSinceStartOfToday = (now - startOfToday) / (1000 * 60 * 60);
         const totalHoursSinceStart = (now - startDate) / (1000 * 60 * 60);
-      
+
         let trafficToday = Math.min(trafficPerDay, (hoursSinceStartOfToday * trafficPerDay) / 24);
-      
+
         // Nếu đang ở ngày mới và không phải là ngày đầu tiên của chiến dịch, reset trafficToday
         if (totalHoursSinceStart > 24 && startOfToday > startDate) {
           trafficToday += existingTrafficToday;
@@ -75,6 +76,15 @@ const Dashboard = () => {
         setEditingData(null);
         // Refetch hoặc cập nhật state nếu cần
     };
+    const toggleActive = async (data, isActive) => {
+      const docRef = doc(db, 'trafficData', data.id);
+      await updateDoc(docRef, { isActive });
+  
+      // Cập nhật state để phản ánh thay đổi
+      setTrafficData(trafficData.map(td => 
+        td.id === data.id ? { ...td, isActive } : td
+      ));
+  };
   return (
     <>
     <Navbar></Navbar>
@@ -147,33 +157,6 @@ const Dashboard = () => {
            </form>
           )}
             </Modal>
-  {/* {editingData && (
-              <form onSubmit={submitEdit}>
-                  <input
-                      name="url"
-                      value={editingData.url}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      type="number"
-                      name="numberOfDays"
-                      value={editingData.numberOfDays}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      type="number"
-                      name="trafficPerDay"
-                      value={editingData.trafficPerDay}
-                      onChange={handleEditChange}
-                  />
-                  <input
-                      name="googleKeyword"
-                      value={editingData.googleKeyword || ''}
-                      onChange={handleEditChange}
-                  />
-                  <button type="submit">Lưu</button>
-              </form>
-          )} */}
   {trafficData.map((data) => (
     <div key={data.id} className="mb-6 p-4 border rounded-lg bg-white shadow">
       <button onClick={() => startEdit(data)}>Chỉnh sửa</button>
@@ -186,17 +169,31 @@ const Dashboard = () => {
       <p>Số traffic trên ngày: {data.trafficPerDay}</p>
       <p>Số traffic hôm nay: {data.trafficToday}</p>
       <p>Người tạo: {data.createdBy}</p>
-      <p>
-        Trạng thái: 
-        {data.isRunning ? 
-          <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-            Đang chạy
-          </span> : 
-          <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-            Hoàn thành
-          </span>
-        }
-      </p>
+      <label className="flex items-center cursor-pointer">
+                <div className="relative">
+                    <input type="checkbox" checked={data.isActive} className="sr-only" onChange={() => toggleActive(data, !data.isActive)} />
+                    <div className="block bg-gray-600 w-14 h-8 rounded-full"></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${data.isActive ? 'transform translate-x-full bg-blue-500' : ''}`}></div>
+                </div>
+                <div className="ml-3 text-gray-700 font-medium">
+                    {data.isActive ? 'Active' : 'Inactive'}
+                </div>
+            </label>
+            <p>
+            Trạng thái: 
+            {data.isActive ? 
+                (data.isRunning ? 
+                    <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Đang chạy
+                    </span> : 
+                    <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                        Hoàn thành
+                    </span>) : 
+                <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    Inactive
+                </span>
+            }
+        </p>
       <TrafficChart trafficData={[data]} />
     </div>
   ))}
