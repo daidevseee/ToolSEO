@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { db, storage } from "../Service/firebase";
 import { FileIcon } from "react-file-icon";
+import Editor from '@monaco-editor/react';
+import Modal from "./Modaleditor";
 import {
   collection,
   query,
@@ -8,17 +10,33 @@ import {
   orderBy,
   onSnapshot,
   doc,
-  deleteDoc,
+  deleteDoc, setDoc,
   updateDoc, serverTimestamp
 } from "firebase/firestore";
 import { ref, deleteObject, uploadBytes, getDownloadURL } from "firebase/storage"; // Thêm dòng này
-function FileItem({ file,onDelete,currentFolder, onUpdate}) {
+function FileItem({ file,onDelete,currentFolder, onUpdate, setFiles }) {
   const [newFile, setNewFile] = useState(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editorContent, setEditorContent] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleFileChange = (event) => {
     setNewFile(event.target.files[0]);
     handleUpdate(event.target.files[0]);
   };
-
+  const handleEditClick = async () => {
+    setIsModalOpen(true); // Mở modal
+    try {
+      const response = await fetch(file.url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.text();
+      setEditorContent(data); // Cập nhật nội dung trong editor
+    } catch (error) {
+      console.error('Error fetching file:', error);
+    }
+  };
+  
   const handleUpdate = async (newFile) => {
     // Chỉ tiến hành nếu có file mới được chọn
     if (newFile) {
@@ -63,20 +81,101 @@ function FileItem({ file,onDelete,currentFolder, onUpdate}) {
 
   const fileExtension = getFileExtension(file.name);
   // Định dạng ngày từ timestamp của Firestore
-  const formattedDate = file.createdAt?.toDate().toLocaleDateString("en-US", {
+  let formattedDate;
+if (file.createdAt && typeof file.createdAt.toDate === 'function') {
+  formattedDate = file.createdAt.toDate().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-  
+} else if (file.createdAt) { // Nếu createdAt là một chuỗi hoặc số
+  formattedDate = new Date(file.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+} else {
+  formattedDate = 'Unknown Date'; // Hoặc một giá trị mặc định nếu createdAt không tồn tại
+}
   const truncateFileName = (name, maxLength) => {
     if (name.length > maxLength) {
       return name.substring(0, maxLength) + '...'; // Cắt chuỗi và thêm '...'
     }
     return name; // Nếu không quá giới hạn thì trả về tên gốc
   };
+  const saveChanges = async () => {
+    // Xử lý logic lưu thay đổi vào file hiện tại
+    const fileDocRef = doc(db, "files", file.id);
+    try {
+      await updateDoc(fileDocRef, {
+        content: editorContent, // Giả sử trường 'content' chứa nội dung file JSON
+        updatedAt: serverTimestamp(),
+      });
+  
+      // Cập nhật trạng thái local sau khi lưu thay đổi
+      onUpdate(file.id, {
+        content: editorContent,
+      });
+  
+      setIsModalOpen(false); // Đóng modal sau khi lưu
+    } catch (error) {
+      console.error("Error updating file:", error);
+    }
+  };
+  
+  const copyAsNewFile = async () => {
+    // Xử lý logic tạo một bản sao mới của file với những thay đổi
+    const newFileRef = ref(storage, `${currentFolder}/${file.name}_copy`);
+    const newFileBlob = new Blob([editorContent], { type: 'application/json' });
+  
+    try {
+      // Tải file mới lên Firebase Storage
+      await uploadBytes(newFileRef, newFileBlob);
+      const newUrl = await getDownloadURL(newFileRef);
+  
+      // Tạo tài liệu mới trong Firestore với nội dung đã chỉnh sửa
+      const newFileDocRef = doc(collection(db, "files"));
+      await setDoc(newFileDocRef, {
+        name: `${file.name}_copy`,
+        url: newUrl,
+        size: newFileBlob.size,
+        createdAt: serverTimestamp(),
+        content: editorContent, // Giả sử trường 'content' chứa nội dung file JSON
+      });
+      const newFileData = {
+        id: newFileDocRef.id, // Đảm bảo bạn lấy được ID mới từ document reference
+        name: `${file.name}_copy`,
+        url: newUrl,
+        size: newFileBlob.size,
+        createdAt: new Date(), // Firestore timestamp sẽ được chuyển đổi thành Date object
+        // ... thêm các trường khác nếu cần
+      };
+      setFiles((prevFiles) => [...prevFiles, newFileData]);
+      setIsModalOpen(false); // Đóng modal sau khi tạo bản sao mới
+    } catch (error) {
+      console.error("Error creating a copy of file:", error);
+    }
+  };
+  
   return (
+    <>
     
+
+    
+    <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} onSave={saveChanges} onCopyAsNew={copyAsNewFile}>
+  <div className="fullscreen-modal">
+    <Editor
+      className="editor-container"
+      height="100%"
+      defaultLanguage="json"
+      value={editorContent}
+      onChange={(value) => setEditorContent(value)}
+      options={{ automaticLayout: true }}
+    />
+    {/* Thêm các nút hoặc chức năng khác nếu cần */}
+  </div>
+</Modal>
+
     <div style={{ flex: '1 0 30%', margin: '20px 10px', height: '100%', boxSizing: 'border-box' }}>
 
     <div style={{ flex: '1 0 30%', margin: '0 10px 0 10px', height: '100%', boxSizing: 'border-box' }}>
@@ -194,11 +293,15 @@ function FileItem({ file,onDelete,currentFolder, onUpdate}) {
           </div>
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
           <a href={file.url} target="_blank" rel="noopener noreferrer">View File</a>
+          <button onClick={handleEditClick} className="btn">Edit</button>
           </span>
+         
         </div>
       </div>
     </div>
     </div>
+    </>
+    
    
   );
 }
@@ -232,21 +335,22 @@ function FileList({ currentFolder }) {
       return () => unsubscribe();
     }
   }, [currentFolder]);
-  const handleDelete = async (fileId) => {
+  const handleDelete = async (fileId, filePath) => { // filePath là đường dẫn đến file trong Storage
     try {
       // Xóa file khỏi Firestore
       await deleteDoc(doc(db, "files", fileId));
-
-      // Xóa file khỏi Firebase Storage nếu cần
-      const fileRef = ref(storage, `đường_dẫn_đến_file`);
+  
+      // Xóa file khỏi Firebase Storage
+      const fileRef = ref(storage, filePath);
       await deleteObject(fileRef);
-
+  
       // Cập nhật UI
-      setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
+      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
     } catch (error) {
       console.error("Error deleting file:", error);
     }
   };
+  
   const renderPlaceholderItems = (count) => {
     return [...Array(count)].map((_, index) => (
       <div key={`placeholder-${index}`} style={{ flex: '1 0 30%', margin: '0 10px', visibility: 'hidden' }}>
@@ -259,7 +363,7 @@ function FileList({ currentFolder }) {
        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-start", marginLeft: "40px" }}>
        {files.length > 0 ? (
           files.map((file) => (
-            <FileItem key={file.id} file={file} currentFolder={currentFolder} onDelete={handleDelete} onUpdate={handleUpdate} />
+            <FileItem key={file.id} file={file} currentFolder={currentFolder} onDelete={() => handleDelete(file.id, file.url)} onUpdate={handleUpdate} setFiles={setFiles} />
           ))
         ) : (
           <div style={{ width: '100%', textAlign: 'center' }}><div class="terminal-loader">

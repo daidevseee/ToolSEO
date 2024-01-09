@@ -141,3 +141,15 @@
     height: 500px; /* Đặt chiều cao cố định hoặc theo tỷ lệ phần trăm */
     border: 1px solid black; /* Chỉ để kiểm tra hiển thị */
   }
+  .fullscreen-modal {
+    width: 100vw;  /* Chiều rộng toàn màn hình */
+    height: 100vh; /* Chiều cao toàn màn hình */
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+  
+  .editor-container {
+    width: 100%;
+    height: 90%; /* Hoặc một giá trị tùy chỉnh phù hợp */
+  }
+  
