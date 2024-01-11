@@ -49,7 +49,14 @@ const schemaTemplates = {
   FAQPage: {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": []
+    "mainEntity": [{  // Array of Questions
+      "@type": "Question",
+      "name": "",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": ""
+      }
+    }]
   },
   Person: {
     "@context": "https://schema.org",
@@ -60,6 +67,60 @@ const schemaTemplates = {
     "worksFor": {
       "@type": "Organization",
       "name": ""
+    },
+    "@id": "", // Newly added
+    "description": "", // Newly added
+    "sameAs": [], // Newly added
+    "image": { // Newly added
+      "@type": "ImageObject",
+      "@id": "",
+      "url": "",
+      "caption": ""
+    },
+    "mainEntityOfPage": { // Newly added
+      "@type": "ProfilePage",
+      "@id": "",
+      "url": "",
+      "name": "",
+      "inLanguage": "",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "",
+        "url": "",
+        "name": "",
+        "publisher": {
+          "@type": "Organization",
+          "@id": "",
+          "name": "",
+          "url": "",
+          "email": "",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "",
+            "addressLocality": "",
+            "addressRegion": "",
+            "postalCode": "",
+            "addressCountry": {
+              "@type": "Country",
+              "name": ""
+            }
+          },
+          "logo": {
+            "@type": "ImageObject",
+            "@id": "",
+            "url": "",
+            "contentUrl": "",
+            "caption": "",
+            "width": "",
+            "height": ""
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "",
+            "contactType": ""
+          }
+        }
+      }
     }
   },
   LocalBusiness: {
@@ -247,7 +308,20 @@ const SchemaGenerator = () => {
         console.error('Failed to copy text to clipboard', err);
       });
   };
-  
+  const addNewQuestion = () => {
+    const newQuestion = {
+      "@type": "Question",
+      "name": "",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": ""
+      }
+    };
+    setSchema({
+      ...schema,
+      mainEntity: [...schema.mainEntity, newQuestion]
+    });
+  };
   const renderInput = (label, path, type = 'text') => {
     // Retrieve the value from the schema using the path
     let value = path.reduce((acc, key) => acc[key] || '', schema);
@@ -314,18 +388,69 @@ const SchemaGenerator = () => {
             {renderInput('Available Language', ['contactPoint', 'availableLanguage'])}
           </>
         );
-      case 'FAQPage':
-        // A more complex rendering would be required for FAQPage
-        return <div>FAQPage inputs would go here</div>;
-      case 'Person':
+        case 'FAQPage':
         return (
-          <>
-            {renderInput('Name', ['name'])}
-            {renderInput('URL', ['url'])}
-            {renderInput('Job Title', ['jobTitle'])}
-            {renderInput('Works For', ['worksFor', 'name'])}
-          </>
+          <div>
+            {schema.mainEntity.map((question, index) => (
+              <div key={index}>
+                <h3 className="text-lg font-bold">Question {index + 1}</h3>
+                {renderInput(`Question ${index + 1} Name`, ['mainEntity', index, 'name'])}
+                {renderInput(`Question ${index + 1} Answer`, ['mainEntity', index, 'acceptedAnswer', 'text'], 'textarea')}
+              </div>
+            ))}
+            <div style={{display:"flex", justifyContent:"center"}}>
+
+            <button 
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={addNewQuestion}
+            >
+              Add New Question
+            </button>
+            </div>
+          </div>
         );
+        case 'Person':
+          return (
+            <>
+             {renderInput('Person ID', ['@id'])}
+          {renderInput('Name', ['name'])}
+          {renderInput('URL', ['url'])}
+          {renderInput('Job Title', ['jobTitle'])}
+          {renderInput('Description', ['description'])}
+          {renderInput('Same As', ['sameAs'], 'array')}
+          {renderInput('Image Object ID', ['image', '@id'])}
+          {renderInput('Image URL', ['image', 'url'])}
+          {renderInput('Image Caption', ['image', 'caption'])}
+          {renderInput('Works For - Organization ID', ['worksFor', '@id'])}
+          {renderInput('Works For - Organization Name', ['worksFor', 'name'])}
+          {renderInput('Works For - URL', ['worksFor', 'url'])}
+          {renderInput('Works For - Email', ['worksFor', 'email'])}
+          {renderInput('Works For - Street Address', ['worksFor', 'address', 'streetAddress'])}
+          {renderInput('Works For - Locality', ['worksFor', 'address', 'addressLocality'])}
+          {renderInput('Works For - Region', ['worksFor', 'address', 'addressRegion'])}
+          {renderInput('Works For - Postal Code', ['worksFor', 'address', 'postalCode'])}
+          {renderInput('Works For - Country', ['worksFor', 'address', 'addressCountry', 'name'])}
+          {renderInput('Works For - Logo ID', ['worksFor', 'logo', '@id'])}
+          {renderInput('Works For - Logo URL', ['worksFor', 'logo', 'url'])}
+          {renderInput('Works For - Logo Content URL', ['worksFor', 'logo', 'contentUrl'])}
+          {renderInput('Works For - Logo Caption', ['worksFor', 'logo', 'caption'])}
+          {renderInput('Works For - Logo Width', ['worksFor', 'logo', 'width'])}
+          {renderInput('Works For - Logo Height', ['worksFor', 'logo', 'height'])}
+          {renderInput('Works For - Telephone', ['worksFor', 'contactPoint', 'telephone'])}
+          {renderInput('Works For - Contact Type', ['worksFor', 'contactPoint', 'contactType'])}
+          {renderInput('Main Entity Of Page - ID', ['mainEntityOfPage', '@id'])}
+          {renderInput('Main Entity Of Page - URL', ['mainEntityOfPage', 'url'])}
+          {renderInput('Main Entity Of Page - Name', ['mainEntityOfPage', 'name'])}
+          {renderInput('Main Entity Of Page - Language', ['mainEntityOfPage', 'inLanguage'])}
+          {renderInput('Main Entity Of Page - Is Part Of - ID', ['mainEntityOfPage', 'isPartOf', '@id'])}
+          {renderInput('Main Entity Of Page - Is Part Of - URL', ['mainEntityOfPage', 'isPartOf', 'url'])}
+          {renderInput('Main Entity Of Page - Is Part Of - Name', ['mainEntityOfPage', 'isPartOf', 'name'])}
+          {renderInput('Main Entity Of Page - Is Part Of - Publisher - ID', ['mainEntityOfPage', 'isPartOf', 'publisher', '@id'])}
+          {renderInput('Main Entity Of Page - Is Part Of - Publisher - Name', ['mainEntityOfPage', 'isPartOf', 'publisher', 'name'])}
+          {renderInput('Main Entity Of Page - Is Part Of - Publisher - URL', ['mainEntityOfPage', 'isPartOf', 'publisher', 'url'])}
+          {renderInput('Main Entity Of Page - Is Part Of - Publisher - Email', ['mainEntityOfPage', 'isPartOf', 'publisher', 'email'])}
+            </>
+          );
         case 'LocalBusiness':
           return (
             <>
