@@ -152,4 +152,56 @@
     width: 100%;
     height: 90%; /* Hoặc một giá trị tùy chỉnh phù hợp */
   }
-  
+  /* Add this CSS to your stylesheet or within a <style> tag */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  margin-left: 10px;
+  gap: 20px; /* Adjust the gap as needed */
+}
+
+.folder-item {
+  width: calc(25% - 20px); /* Subtract the total horizontal gap */
+  position: relative;
+  background-color: white;
+  padding: 24px;
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Adjust the margin as needed */
+}
+
+@media (max-width: 1024px) {
+  .folder-item {
+    width: calc(33.333% - 20px); /* 3 items per row */
+  }
+}
+
+@media (max-width: 768px) {
+  .folder-item {
+    width: calc(50% - 20px); /* 2 items per row */
+  }
+}
+
+@media (max-width: 480px) {
+  .folder-item {
+    width: 100%; /* 1 item per row */
+  }
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px; /* adjust as needed */
+  right: 5px; /* adjust as needed */
+  background-color: #ffcccc; /* light red background for visibility */
+  border: 1px solid #ff0000; /* red border */
+  border-radius: 5px; /* rounded corners */
+  padding: 2px 5px;
+  cursor: pointer;
+  z-index: 1000; /* high z-index to ensure it's on top */
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: bold;
+}

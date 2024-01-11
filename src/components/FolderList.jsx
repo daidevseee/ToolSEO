@@ -33,29 +33,31 @@ function FolderList({ onSelectFolder }) {
 
   return (
     <div>
-      <div style={{marginTop:"20px", cursor: "pointer"}} className="flex justify-center space-x-4">
-        {folders.map((folder, index) => (
-          <div 
-            style={{width:"200px", position: 'relative'}} 
-            key={folder.id} 
-            className="folder-item bg-white p-6 max-w-sm rounded-lg border border-gray-200 shadow-md"
-            onClick={() => handleFolderClick(folder.id)}
-          >
-            <div className="flex justify-center mb-4">
-              <img width={"75px"} src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" alt="icon folder" />
-            </div>
-            <h5 style={{textAlign:"center"}} className="text-xl font-medium text-gray-900 mb-2">{folder.name}</h5>
-            <button 
-              style={{position: 'absolute', top: '0', right: '0'}} 
-              className="delete-button text-red-600 hover:text-red-700"
-              onClick={(e) => handleDeleteFolder(folder.id, e)}
-            >
-              X
-            </button>
+    <div className="container">
+      {folders.map((folder, index) => (
+        <div 
+          key={folder.id} 
+          className="folder-item"
+          onClick={() => handleFolderClick(folder.id)}
+        >
+          <div className="flex justify-center mb-4">
+            <img width={"75px"} src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" alt="icon folder" />
           </div>
-        ))}
-      </div>
+          <h5 style={{textAlign:"center"}} className="text-xl font-medium text-gray-900 mb-2">{folder.name}</h5>
+          <button 
+              className="delete-button"
+              onClick={(e) => {
+                e.stopPropagation(); // Stop the click event from bubbling up to the parent
+                handleDeleteFolder(folder.id, e);
+              }}
+            >
+              Xóa
+            </button>
+        </div>
+      ))}
     </div>
+  </div>
+  
   );
 };
 
